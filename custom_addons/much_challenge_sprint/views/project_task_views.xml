@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+    <!-- Extend Task Form View to Add Sprint Field -->
+    <record id="view_task_form_inherit_sprint" model="ir.ui.view">
+        <field name="name">project.task.form.inherit.sprint</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="project.view_task_form2"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='tag_ids']" position="before">
+                <field name="sprint_id" 
+                       options="{'no_create': True}"
+                       domain="[('project_id', '=', project_id), ('state', 'in', ['draft', 'active'])]"/>
+                <field name="story_points"/>
+            </xpath>
+        </field>
+    </record>
+    
+    <!-- Extend Task Tree View to Add Sprint Column -->
+    <record id="view_task_tree_inherit_sprint" model="ir.ui.view">
+        <field name="name">project.task.tree.inherit.sprint</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="project.view_task_tree2"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='stage_id']" position="before">
+                <field name="sprint_id" optional="show"/>
+                <field name="story_points" optional="show"/>
+            </xpath>
+        </field>
+    </record>
+    
+    <!-- Extend Task Search View to Add Sprint Filter -->
+    <record id="view_task_search_inherit_sprint" model="ir.ui.view">
+        <field name="name">project.task.search.inherit.sprint</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="project.view_task_search_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search/field[1]" position="after">
+                <field name="sprint_id"/>
+            </xpath>
+            <xpath expr="//search/group" position="before">
+                <separator/>
+                <filter string="In Sprint" name="in_sprint" domain="[('sprint_id', '!=', False)]"/>
+                <filter string="Backlog" name="backlog" domain="[('sprint_id', '=', False)]"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

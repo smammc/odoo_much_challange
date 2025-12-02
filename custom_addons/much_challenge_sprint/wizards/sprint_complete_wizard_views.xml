@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+    <!-- Sprint Complete Wizard Form View -->
+    <record id="view_sprint_complete_wizard_form" model="ir.ui.view">
+        <field name="name">sprint.complete.wizard.form</field>
+        <field name="model">sprint.complete.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Complete Sprint">
+                <group>
+                    <group>
+                        <field name="sprint_id" readonly="1"/>
+                        <field name="project_id" invisible="1"/>
+                        <field name="incomplete_task_count" readonly="1"/>
+                    </group>
+                    <group>
+                        <field name="action" widget="radio"/>
+                        <field name="next_sprint_id" 
+                               attrs="{'invisible': [('action', '!=', 'move')], 'required': [('action', '=', 'move')]}"
+                               options="{'no_create': True}"/>
+                    </group>
+                </group>
+                <separator string="Incomplete Tasks"/>
+                <field name="task_ids" readonly="1">
+                    <tree>
+                        <field name="name"/>
+                        <field name="user_ids" widget="many2many_avatar_user"/>
+                        <field name="story_points"/>
+                        <field name="stage_id"/>
+                    </tree>
+                </field>
+                <footer>
+                    <button name="action_confirm" 
+                            string="Complete Sprint" 
+                            type="object" 
+                            class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+    <!-- Extend Project Form View to Add Sprint Smart Button -->
+    <record id="view_project_form_inherit_sprint" model="ir.ui.view">
+        <field name="name">project.project.form.inherit.sprint</field>
+        <field name="model">project.project</field>
+        <field name="inherit_id" ref="project.edit_project"/>
+        <field name="arch" type="xml">
+            <div name="button_box" position="inside">
+                <button name="action_view_sprints"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-rocket">
+                    <field name="sprint_count" widget="statinfo" string="Sprints"/>
+                </button>
+            </div>
+        </field>
+    </record>
+    
+    <!-- Extend Project Kanban View to Show Active Sprint -->
+    <record id="view_project_kanban_inherit_sprint" model="ir.ui.view">
+        <field name="name">project.project.kanban.inherit.sprint</field>
+        <field name="model">project.project</field>
+        <field name="inherit_id" ref="project.view_project_kanban"/>
+        <field name="arch" type="xml">
+            <field name="partner_id" position="after">
+                <field name="active_sprint_id"/>
+                <field name="sprint_count"/>
+            </field>
+        </field>
+    </record>
+
+</odoo>

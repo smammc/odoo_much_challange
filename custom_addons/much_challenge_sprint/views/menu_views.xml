@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+    <!-- Sprint Menu Item under Project -->
+    <menuitem
+        id="menu_project_sprint"
+        name="Sprints"
+        parent="project.menu_main_pm"
+        action="action_project_sprint"
+        sequence="5"/>
+
+</odoo>
