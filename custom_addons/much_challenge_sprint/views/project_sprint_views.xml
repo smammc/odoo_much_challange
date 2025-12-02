@@ -63,6 +63,13 @@
                                 icon="fa-tasks">
                             <field name="task_count" widget="statinfo" string="Tasks"/>
                         </button>
+                        <button name="action_add_existing_tasks"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-plus-circle"
+                                attrs="{'invisible': [('project_id', '=', False)]}">
+                            <field name="backlog_task_count" widget="statinfo" string="Backlog"/>
+                        </button>
                     </div>
                     <div class="oe_title">
                         <h1>
@@ -85,14 +92,13 @@
                     </group>
                     <notebook>
                         <page string="Tasks" name="tasks">
-                            <group>
-                                <field name="available_task_ids" 
-                                       string="Add Existing Tasks"
-                                       widget="many2many_tags"
-                                       options="{'no_create': True}"
-                                       placeholder="Select tasks from backlog to add to this sprint..."/>
-                            </group>
-                            <separator string="Sprint Tasks"/>
+                            <div class="mb-3">
+                                <button name="action_add_existing_tasks" 
+                                        type="object" 
+                                        string="+ Add Existing Tasks" 
+                                        class="btn btn-secondary"
+                                        attrs="{'invisible': [('project_id', '=', False)]}"/>
+                            </div>
                             <field name="task_ids">
                                 <tree editable="bottom">
                                     <field name="priority" widget="priority"/>

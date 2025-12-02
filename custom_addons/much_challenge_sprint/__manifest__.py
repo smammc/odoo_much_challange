@@ -19,6 +19,7 @@ Features
 * Sprint completion workflow with incomplete task handling
 * Sprint overlap validation
 * Project-sprint consistency checks
+* Add existing tasks from backlog to sprints
     """,
     'author': 'Sebastião Maia Cerqueira',
     'website': 'https://muchchallenge.com',
@@ -36,7 +37,10 @@ Features
         'views/project_sprint_views.xml',
         'views/project_task_views.xml',
         'views/project_project_views.xml',
+        
+        # Wizards
         'wizards/sprint_complete_wizard_views.xml',
+        'wizards/add_tasks_wizard_views.xml',
         
         # Menu last
         'views/menu_views.xml',

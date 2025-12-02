@@ -75,19 +75,6 @@ class ProjectSprint(models.Model):
         string='Tasks'
     )
     
-    # Field to add existing tasks
-    available_task_ids = fields.Many2many(
-        'project.task',
-        'sprint_available_task_rel',
-        'sprint_id',
-        'task_id',
-        string='Add Existing Tasks',
-        compute='_compute_available_tasks',
-        inverse='_inverse_available_tasks',
-        domain="[('project_id', '=', project_id), ('sprint_id', '=', False)]",
-        help="Select existing tasks from backlog to add to this sprint"
-    )
-    
     user_id = fields.Many2one(
         'res.users',
         string='Scrum Master',
@@ -145,6 +132,11 @@ class ProjectSprint(models.Model):
         string='Velocity (Points/Day)'
     )
     
+    backlog_task_count = fields.Integer(
+        compute='_compute_backlog_task_count',
+        string='Backlog Tasks'
+    )
+    
     # Compute Methods
     @api.depends('task_ids', 'task_ids.stage_id', 'task_ids.stage_id.fold', 'task_ids.story_points')
     def _compute_task_metrics(self):
@@ -189,31 +181,18 @@ class ProjectSprint(models.Model):
             else:
                 sprint.velocity = 0.0
     
-    def _compute_available_tasks(self):
-        """Compute available tasks - shows tasks currently in sprint"""
+    @api.depends('project_id')
+    def _compute_backlog_task_count(self):
+        """Count available backlog tasks for this project"""
         for sprint in self:
-            sprint.available_task_ids = sprint.task_ids
-    
-    def _inverse_available_tasks(self):
-        """When tasks are added/removed via available_task_ids, update their sprint_id"""
-        for sprint in self:
-            # Get currently assigned tasks
-            current_tasks = sprint.task_ids
-            # Get newly selected tasks
-            new_tasks = sprint.available_task_ids
-            
-            # Tasks to remove from sprint (were in current but not in new)
-            tasks_to_remove = current_tasks - new_tasks
-            # Tasks to add to sprint (are in new but not in current)
-            tasks_to_add = new_tasks - current_tasks
-            
-            # Update sprint_id for removed tasks
-            if tasks_to_remove:
-                tasks_to_remove.write({'sprint_id': False})
-            
-            # Update sprint_id for added tasks
-            if tasks_to_add:
-                tasks_to_add.write({'sprint_id': sprint.id})
+            if sprint.project_id:
+                count = self.env['project.task'].search_count([
+                    ('project_id', '=', sprint.project_id.id),
+                    ('sprint_id', '=', False)
+                ])
+                sprint.backlog_task_count = count
+            else:
+                sprint.backlog_task_count = 0
     
     # Constraints
     @api.constrains('start_date', 'end_date')
@@ -251,12 +230,6 @@ class ProjectSprint(models.Model):
         """Auto-set end date to 2 weeks from start"""
         if self.start_date and not self.end_date:
             self.end_date = self.start_date + timedelta(days=13)
-    
-    @api.onchange('project_id')
-    def _onchange_project_id(self):
-        """Clear tasks when project changes"""
-        if self.project_id:
-            self.available_task_ids = [(5, 0, 0)]
     
     # Action Methods
     def action_start(self):
@@ -319,5 +292,19 @@ class ProjectSprint(models.Model):
             'context': {
                 'default_sprint_id': self.id,
                 'default_project_id': self.project_id.id,
+            }
+        }
+    
+    def action_add_existing_tasks(self):
+        """Open wizard to add existing tasks from backlog"""
+        self.ensure_one()
+        return {
+            'name': _('Add Tasks from Backlog'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'sprint.add.tasks.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {
+                'default_sprint_id': self.id,
             }
         }
